@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='utf-8'?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+ <Description about="urn:mozilla:install-manifest">
+  <em:name>HTerr</em:name>
+  <em:id>{E4E173E0-B462-54B7-83B8-1EF15E801FED}</em:id>
+  <em:version>1.0b1</em:version>
+  <em:type>2</em:type>
+  <em:targetApplication>
+   <Description>
+    <em:id>{8de7fcbb-c55c-4fbe-bfc5-fc555c87dbc4}</em:id>
+    <em:minVersion>25.0a1pre</em:minVersion>
+    <em:maxVersion>28.*</em:maxVersion>
+   </Description>
+  </em:targetApplication>
+  <em:description>Fallback error pages for HTTP errors.</em:description>
+  <em:homepageURL>https://realityripple.com/Software/Mozilla-Extensions/HTerr/</em:homepageURL>
+  <em:updateURL>https://realityripple.com/Software/Mozilla-Extensions/HTerr/update.rdf</em:updateURL>
+  <em:iconURL>chrome://hterr/skin/logo.png</em:iconURL>
+  <em:iconURL64>chrome://hterr/skin/logo64.png</em:iconURL64>
+  <em:creator>RealityRipple</em:creator>
+ </Description>
+</RDF>
