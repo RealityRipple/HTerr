@@ -165,6 +165,11 @@ hterr_grabber.TracingListener.prototype = {
         mainDoc = true;
         break;
        }
+       if (gBrowser.browsers[i].contentDocument.location.href === request.name)
+       {
+        mainDoc = true;
+        break;
+       }
       }
       if (mainDoc)
       {
