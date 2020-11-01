@@ -154,6 +154,12 @@ hterr_grabber.TracingListener.prototype = {
       let mainDoc = false;
       for (let i = 0; i < gBrowser.browsers.length; i++)
       {
+       if (gBrowser.browsers[i].contentDocument.readyState === 'complete')
+        continue;
+       if (gBrowser.browsers[i].contentDocument.readyState === 'uninitialized')
+        continue;
+       if (gBrowser.browsers[i].contentDocument.readyState !== 'loading' && gBrowser.browsers[i].contentDocument.readyState !== 'interactive')
+        console.log('Unknown readyState:', gBrowser.browsers[i].contentDocument.readyState, '(Risking it as something to compare)');
        if (gBrowser.browsers[i].contentDocument.location.href === request.originalURI.spec)
        {
         mainDoc = true;
