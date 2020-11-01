@@ -3,7 +3,7 @@
  <Description about="urn:mozilla:install-manifest">
   <em:name>HTerr</em:name>
   <em:id>{E4E173E0-B462-54B7-83B8-1EF15E801FED}</em:id>
-  <em:version>1.0b1</em:version>
+  <em:version>1.0b2</em:version>
   <em:type>2</em:type>
   <em:targetApplication>
    <Description>
