@@ -147,7 +147,12 @@ hterr_grabber.TracingListener.prototype = {
    if (!request.hasOwnProperty('originalURI'))
     return;
    delete hterr_grabber.nullData[request.channelId];
-   let code = request.responseStatus;
+   let code = 0;
+   try
+   {
+    code = request.responseStatus;
+   }
+   catch (ex){}
    if (code < 400)
     return;
    if (code >= 600)
