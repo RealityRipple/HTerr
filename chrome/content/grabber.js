@@ -140,82 +140,87 @@ hterr_grabber.TracingListener.prototype = {
   try
   {
    request.QueryInterface(Components.interfaces.nsIHttpChannel);
-   if (hterr_grabber.nullData[request.channelId] === true && request.hasOwnProperty('responseStatus') && request.hasOwnProperty('originalURI'))
+   if (!hterr_grabber.nullData[request.channelId])
+    return;
+   if (!request.hasOwnProperty('responseStatus'))
+    return;
+   if (!request.hasOwnProperty('originalURI'))
+    return;
+   delete hterr_grabber.nullData[request.channelId];
+   let code = request.responseStatus;
+   if (code < 400)
+    return;
+   if (code >= 600)
+    return;
+   let mime = request.contentType;
+   let cType = mime.substring(0, mime.indexOf('/'));
+   let cEnc = mime.substring(mime.indexOf('/') + 1);
+   if (!(cType === 'text' || (cType === 'application' && (cEnc.includes('html') || cEnc.includes('xml'))) || mime === 'image/svg+xml'))
+    return;
+   let mainDoc = false;
+   for (let i = 0; i < gBrowser.browsers.length; i++)
    {
-    delete hterr_grabber.nullData[request.channelId];
-    let code = request.responseStatus;
-    if (code >= 400 && code < 600)
+    if (gBrowser.browsers[i].contentDocument.readyState === 'complete')
+     continue;
+    if (gBrowser.browsers[i].contentDocument.readyState === 'uninitialized')
+     continue;
+    if (gBrowser.browsers[i].contentDocument.readyState !== 'loading' && gBrowser.browsers[i].contentDocument.readyState !== 'interactive')
+     console.log('Unknown readyState:', gBrowser.browsers[i].contentDocument.readyState, '(Risking it as something to compare)');
+    if (gBrowser.browsers[i].contentDocument.location.href === request.originalURI.spec)
     {
-     let mime = request.contentType;
-     let cType = mime.substring(0, mime.indexOf('/'));
-     let cEnc = mime.substring(mime.indexOf('/') + 1);
-     if (cType === 'text' || (cType === 'application' && (cEnc.includes('html') || cEnc.includes('xml'))) || mime === 'image/svg+xml')
-     {
-      let mainDoc = false;
-      for (let i = 0; i < gBrowser.browsers.length; i++)
-      {
-       if (gBrowser.browsers[i].contentDocument.readyState === 'complete')
-        continue;
-       if (gBrowser.browsers[i].contentDocument.readyState === 'uninitialized')
-        continue;
-       if (gBrowser.browsers[i].contentDocument.readyState !== 'loading' && gBrowser.browsers[i].contentDocument.readyState !== 'interactive')
-        console.log('Unknown readyState:', gBrowser.browsers[i].contentDocument.readyState, '(Risking it as something to compare)');
-       if (gBrowser.browsers[i].contentDocument.location.href === request.originalURI.spec)
-       {
-        mainDoc = true;
-        break;
-       }
-       if (gBrowser.browsers[i].contentDocument.location.href === request.name)
-       {
-        mainDoc = true;
-        break;
-       }
-      }
-      if (mainDoc)
-      {
-       let extraParam = null;
-       try
-       {
-        switch (code)
-        {
-         case 401:
-          extraParam = request.getResponseHeader('WWW-Authenticate');
-          break;
-         case 407:
-          extraParam = request.getResponseHeader('Proxy-Authenticate');
-          break;
-         case 426:
-          extraParam = request.getResponseHeader('Upgrade');
-          break;
-         case 429:
-         case 501:
-         case 503:
-          extraParam = request.getResponseHeader('Retry-After');
-          break;
-        }
-        if (extraParam !== null)
-         extraParam = extraParam.replace(/<[^>]+>/gi, '');
-       }
-       catch (ex) {extraParam = null;}
-       let plainText = false;
-       if (mime === 'text/plain')
-        plainText = true;
-       let txt = hterr_grabber.ErrorBuilder(code, plainText, extraParam);
-       let tCount = txt.length;
-       let iStor = Components.classes['@mozilla.org/io/string-input-stream;1'].getService(Components.interfaces.nsIStringInputStream);
-       iStor.setData(txt, tCount);
-       this.originalListener.onDataAvailable(request, context, iStor, 0, tCount);
-      }
-     }
+     mainDoc = true;
+     break;
+    }
+    if (gBrowser.browsers[i].contentDocument.location.href === request.name)
+    {
+     mainDoc = true;
+     break;
     }
    }
+   if (!mainDoc)
+    return;
+   let extraParam = null;
+   try
+   {
+    switch (code)
+    {
+     case 401:
+      extraParam = request.getResponseHeader('WWW-Authenticate');
+      break;
+     case 407:
+      extraParam = request.getResponseHeader('Proxy-Authenticate');
+      break;
+     case 426:
+      extraParam = request.getResponseHeader('Upgrade');
+      break;
+     case 429:
+     case 501:
+     case 503:
+      extraParam = request.getResponseHeader('Retry-After');
+      break;
+    }
+    if (extraParam !== null)
+     extraParam = extraParam.replace(/<[^>]+>/gi, '');
+   }
+   catch (ex) {extraParam = null;}
+   let plainText = false;
+   if (mime === 'text/plain')
+    plainText = true;
+   let txt = hterr_grabber.ErrorBuilder(code, plainText, extraParam);
+   let tCount = txt.length;
+   let iStor = Components.classes['@mozilla.org/io/string-input-stream;1'].getService(Components.interfaces.nsIStringInputStream);
+   iStor.setData(txt, tCount);
+   this.originalListener.onDataAvailable(request, context, iStor, 0, tCount);
   }
   catch (e) {console.log(e);}
-  try
+  finally
   {
-   this.originalListener.onStopRequest(request, context, statusCode);
+   try
+   {
+    this.originalListener.onStopRequest(request, context, statusCode);
+   }
+   catch (e) {}
   }
-  catch (e) {}
  },
  QueryInterface: function (aIID)
  {
