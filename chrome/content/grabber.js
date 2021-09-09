@@ -159,7 +159,7 @@ var hterr_grabber = {
   if (!wnd)
    return;
   if (wnd.contentWindow.hterrTimer)
-   wnd.contentWindow.clearTimeout(wnd.hterrTimer);
+   wnd.contentWindow.clearTimeout(wnd.contentWindow.hterrTimer);
   if (wnd.contentDocument.body === null)
    return;
   if (wnd.contentDocument.body.scrollHeight > wnd.contentDocument.documentElement.clientHeight)
@@ -297,7 +297,7 @@ hterr_grabber.TracingListener.prototype = {
   if (mainDoc !== false)
   {
    if (mainDoc.contentWindow.hterrTimer)
-    mainDoc.contentWindow.clearTimeout(mainDoc.hterrTimer);
+    mainDoc.contentWindow.clearTimeout(mainDoc.contentWindow.hterrTimer);
   }
   request.QueryInterface(Components.interfaces.nsIHttpChannel);
   hterr_grabber.nullData[request.channelId] = true;
