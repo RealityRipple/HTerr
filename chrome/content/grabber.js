@@ -160,7 +160,7 @@ var hterr_grabber = {
    return;
   if (wnd.contentWindow.hterrTimer)
    wnd.contentWindow.clearTimeout(wnd.contentWindow.hterrTimer);
-  if (wnd.contentDocument.body === null)
+  if (wnd.contentDocument.body === null || wnd.contentDocument.body === undefined)
    return;
   if (wnd.contentDocument.body.scrollHeight > wnd.contentDocument.documentElement.clientHeight)
    return;
