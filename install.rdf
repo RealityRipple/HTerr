@@ -3,27 +3,18 @@
  <Description about="urn:mozilla:install-manifest">
   <em:name>HTerr</em:name>
   <em:id>{E4E173E0-B462-54B7-83B8-1EF15E801FED}</em:id>
-  <em:version>1.1</em:version>
+  <em:version>30.0</em:version>
   <em:type>2</em:type>
-  <!-- Firefox -->
   <em:targetApplication>
    <Description>
     <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
-    <em:minVersion>51.0</em:minVersion>
-    <em:maxVersion>52.*</em:maxVersion>
-   </Description>
-  </em:targetApplication>
-  <!-- Pale Moon -->
-  <em:targetApplication>
-   <Description>
-    <em:id>{8de7fcbb-c55c-4fbe-bfc5-fc555c87dbc4}</em:id>
-    <em:minVersion>25.0a1pre</em:minVersion>
-    <em:maxVersion>29.*</em:maxVersion>
+    <em:minVersion>30.0</em:minVersion>
+    <em:maxVersion>30.*</em:maxVersion>
    </Description>
   </em:targetApplication>
   <em:description>Fallback error pages for HTTP errors.</em:description>
-  <em:homepageURL>https://realityripple.com/Software/Mozilla-Extensions/HTerr/</em:homepageURL>
-  <em:updateURL>https://realityripple.com/Software/Mozilla-Extensions/HTerr/update.rdf</em:updateURL>
+  <em:homepageURL>https://realityripple.com/Software/XUL/HTerr/</em:homepageURL>
+  <em:updateURL>https://realityripple.com/Software/XUL/HTerr/update.rdf</em:updateURL>
   <em:iconURL>chrome://hterr/skin/logo.png</em:iconURL>
   <em:iconURL64>chrome://hterr/skin/logo64.png</em:iconURL64>
   <em:creator>RealityRipple</em:creator>
