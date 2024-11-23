@@ -158,9 +158,13 @@ var hterr_grabber = {
  {
   if (!wnd)
    return;
+  if (!wnd.contentWindow)
+   return;
   if (wnd.contentWindow.hterrTimer)
    wnd.contentWindow.clearTimeout(wnd.contentWindow.hterrTimer);
-  if (wnd.contentDocument.body === null || wnd.contentDocument.body === undefined)
+  if (!wnd.contentDocument)
+   return;
+  if (!wnd.contentDocument.body)
    return;
   if (wnd.contentDocument.body.scrollHeight > wnd.contentDocument.documentElement.clientHeight)
    return;
@@ -225,10 +229,12 @@ var hterr_grabber = {
  DocumentFinder: function(request, mustBeReady)
  {
   let mainDoc = false;
-  if (gBrowser.browsers === undefined || gBrowser.browsers.length < 1)
+  if (!gBrowser.browsers || gBrowser.browsers.length < 1)
    return mainDoc;
   for (let i = 0; i < gBrowser.browsers.length; i++)
   {
+   if (!gBrowser.browsers[i].contentDocument)
+    continue;
    if (mustBeReady)
    {
     if (gBrowser.browsers[i].contentDocument.readyState === 'complete')
@@ -238,7 +244,7 @@ var hterr_grabber = {
     if (gBrowser.browsers[i].contentDocument.readyState !== 'loading' && gBrowser.browsers[i].contentDocument.readyState !== 'interactive')
      console.log('Unknown readyState:', gBrowser.browsers[i].contentDocument.readyState, '(Risking it as something to compare)');
    }
-   if (request.originalURI !== undefined)
+   if (!!request.originalURI)
    {
     if (gBrowser.browsers[i].contentDocument.location.href === request.originalURI.spec)
     {
@@ -289,7 +295,10 @@ hterr_grabber.TracingListener.prototype = {
   {
    this.originalListener.onDataAvailable(request, context, inputStream, offset, count);
   }
-  catch (e) {}
+  catch (e)
+  {
+   request.cancel(e.result);
+  }
  },
  onStartRequest: function(request, context)
  {
@@ -305,7 +314,10 @@ hterr_grabber.TracingListener.prototype = {
   {
    this.originalListener.onStartRequest(request, context);
   }
-  catch (e) {}
+  catch (e)
+  {
+   request.cancel(e.result);
+  }
  },
  onStopRequest: function(request, context, statusCode)
  {
@@ -387,7 +399,10 @@ hterr_grabber.TracingListener.prototype = {
    {
     this.originalListener.onStopRequest(request, context, statusCode);
    }
-   catch (e) {}
+   catch (e)
+   {
+    request.cancel(e.result);
+   }
   }
  },
  QueryInterface: function (aIID)
