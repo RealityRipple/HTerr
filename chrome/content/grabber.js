@@ -268,9 +268,12 @@ var hterr_grabber = {
     return;
    if (aSubject === null)
     return;
+
+   const channel = aSubject.QueryInterface(Components.interfaces.nsITraceableChannel);
+   if (channel === Components.results.NS_NOINTERFACE)
+    return;
    let newListener = new hterr_grabber.TracingListener();
-   aSubject.QueryInterface(Components.interfaces.nsITraceableChannel);
-   newListener.originalListener = aSubject.setNewListener(newListener);
+   newListener.originalListener = channel.setNewListener(newListener);
   },
   QueryInterface : function (aIID)
   {
@@ -289,8 +292,8 @@ hterr_grabber.TracingListener.prototype = {
  {
   if (count < 1)
    return;
-  request.QueryInterface(Components.interfaces.nsIHttpChannel);
-  hterr_grabber.nullData[request.channelId] = false;
+  const channel = request.QueryInterface(Components.interfaces.nsIHttpChannel);
+  hterr_grabber.nullData[channel.channelId] = false;
   try
   {
    this.originalListener.onDataAvailable(request, context, inputStream, offset, count);
@@ -308,8 +311,8 @@ hterr_grabber.TracingListener.prototype = {
    if (mainDoc.contentWindow.hterrTimer)
     mainDoc.contentWindow.clearTimeout(mainDoc.contentWindow.hterrTimer);
   }
-  request.QueryInterface(Components.interfaces.nsIHttpChannel);
-  hterr_grabber.nullData[request.channelId] = true;
+  const channel = request.QueryInterface(Components.interfaces.nsIHttpChannel);
+  hterr_grabber.nullData[channel.channelId] = true;
   try
   {
    this.originalListener.onStartRequest(request, context);
@@ -336,25 +339,25 @@ hterr_grabber.TracingListener.prototype = {
     waitForBlank = 60;
    if (waitForBlank > 0)
     mainDoc.contentWindow.hterrTimer = mainDoc.contentWindow.setTimeout(hterr_grabber.BlankPageChecker, waitForBlank * 1000, mainDoc);
-   request.QueryInterface(Components.interfaces.nsIHttpChannel);
-   if (!hterr_grabber.nullData[request.channelId])
+   const channel = request.QueryInterface(Components.interfaces.nsIHttpChannel);
+   if (!hterr_grabber.nullData[channel.channelId])
     return;
-   if (!request.hasOwnProperty('responseStatus'))
+   if (!channel.hasOwnProperty('responseStatus'))
     return;
-   if (!request.hasOwnProperty('originalURI'))
+   if (!channel.hasOwnProperty('originalURI'))
     return;
-   delete hterr_grabber.nullData[request.channelId];
+   delete hterr_grabber.nullData[channel.channelId];
    let code = 0;
    try
    {
-    code = request.responseStatus;
+    code = channel.responseStatus;
    }
    catch (ex){}
    if (code < 400)
     return;
    if (code >= 600)
     return;
-   let mime = request.contentType;
+   let mime = channel.contentType;
    let cType = mime.substring(0, mime.indexOf('/'));
    let cEnc = mime.substring(mime.indexOf('/') + 1);
    if (!(cType === 'text' || (cType === 'application' && (cEnc.includes('html') || cEnc.includes('xml'))) || mime === 'image/svg+xml'))
@@ -365,18 +368,18 @@ hterr_grabber.TracingListener.prototype = {
     switch (code)
     {
      case 401:
-      extraParam = request.getResponseHeader('WWW-Authenticate');
+      extraParam = channel.getResponseHeader('WWW-Authenticate');
       break;
      case 407:
-      extraParam = request.getResponseHeader('Proxy-Authenticate');
+      extraParam = channel.getResponseHeader('Proxy-Authenticate');
       break;
      case 426:
-      extraParam = request.getResponseHeader('Upgrade');
+      extraParam = channel.getResponseHeader('Upgrade');
       break;
      case 429:
      case 501:
      case 503:
-      extraParam = request.getResponseHeader('Retry-After');
+      extraParam = channel.getResponseHeader('Retry-After');
       break;
     }
     if (extraParam !== null)
