@@ -357,11 +357,22 @@ hterr_grabber.TracingListener.prototype = {
     return;
    if (code >= 600)
     return;
-   let mime = channel.contentType;
-   let cType = mime.substring(0, mime.indexOf('/'));
-   let cEnc = mime.substring(mime.indexOf('/') + 1);
-   if (!(cType === 'text' || (cType === 'application' && (cEnc.includes('html') || cEnc.includes('xml'))) || mime === 'image/svg+xml'))
-    return;
+   let mime = false;
+   try
+   {
+    mime = channel.contentType;
+   }
+   catch (ex)
+   {
+    mime = false;
+   }
+   if (!!mime)
+   {
+    let cType = mime.substring(0, mime.indexOf('/'));
+    let cEnc = mime.substring(mime.indexOf('/') + 1);
+    if (!(cType === 'text' || (cType === 'application' && (cEnc.includes('html') || cEnc.includes('xml'))) || mime === 'image/svg+xml'))
+     return;
+   }
    let extraParam = null;
    try
    {
