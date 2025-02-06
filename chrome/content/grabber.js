@@ -170,6 +170,8 @@ var hterr_grabber = {
    return;
   if (wnd.contentDocument.body.scrollWidth > wnd.contentDocument.documentElement.clientWidth)
    return;
+  if (!!wnd.contentDocument.plugins && wnd.contentDocument.plugins.length > 0)
+   return;
   const canvas = wnd.contentDocument.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
   canvas.width = wnd.contentDocument.documentElement.clientWidth;
   canvas.height = wnd.contentDocument.documentElement.clientHeight;
